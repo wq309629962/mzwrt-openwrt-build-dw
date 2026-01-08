@@ -91,6 +91,8 @@ jobs:
     - name: Update & Install feeds
       working-directory: /mnt/openwrt/openwrt
       run: |
+        make clean
+        make dirclean
         ./scripts/feeds update mzwrt_package
 
         #./scripts/feeds update -a
