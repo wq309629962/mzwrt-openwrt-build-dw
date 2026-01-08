@@ -75,6 +75,18 @@ jobs:
         cp -f ../mzwrt-openwrt/diy1.sh ./
         chmod +x ./diy1.sh && ./diy1.sh
 
+    - name: Display system info
+      run: |
+        echo "======================="
+        uname -a
+        echo "======================="
+        df -h
+        echo "======================="
+        free -m
+        echo "======================="
+        echo $PATH
+        echo "======================="
+
     # 5. Update & Install feeds
     - name: Update & Install feeds
       working-directory: /mnt/openwrt/openwrt
