@@ -73,7 +73,7 @@ jobs:
         git clone -b $OPENWRT_VERSION --single-branch --depth=1 $REPO_URL $OPENWRT_DIR
         cd openwrt
         cp -f ../mzwrt-openwrt/diy1.sh ./
-        chmod +x ./diy1.sh && ./diy1.sh
+        #chmod +x ./diy1.sh && ./diy1.sh
 
     - name: Display system info
       run: |
@@ -93,10 +93,8 @@ jobs:
       run: |
         make clean
         make dirclean
-        ./scripts/feeds update mzwrt_package
-
-        #./scripts/feeds update -a
-        #./scripts/feeds install -a
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
         cp -f ../mzwrt-openwrt/diy2.sh ./
         chmod +x ./diy2.sh && ./diy2.sh 
 
