@@ -200,13 +200,13 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: CMCC-RAX3000M-MzWrt
-        path: /mnt/openwrt/openwrt/${{ steps.generate_name.outputs.RELEASE_NAME }}/*.{bin,tar.gz}
+        path: /mnt/openwrt/openwrt/${{ steps.generate_name.outputs.RELEASE_NAME }}/*
 
     # 12. Create Release & Upload
     - name: Create Release & Upload
       uses: ncipollo/release-action@v1.14.0
       with:
-        artifacts: /mnt/openwrt/openwrt/${{ steps.generate_name.outputs.RELEASE_NAME }}/*.{bin,tar.gz}
+        artifacts: /mnt/openwrt/openwrt/${{ steps.generate_name.outputs.RELEASE_NAME }}/*
         name: ${{ steps.generate_name.outputs.RELEASE_NAME }}
         tag: ${{ steps.generate_name.outputs.RELEASE_TAG }}
         body: CMCC-RAX3000M NAND firmware
@@ -218,9 +218,9 @@ jobs:
         git clone https://github.com/mzwrt/mzwrt-openwrt.git
         cd mzwrt-openwrt
         gh release create ${{ steps.generate_name.outputs.RELEASE_TAG }} \
-              /mnt/openwrt/openwrt/${{ steps.generate_name.outputs.RELEASE_NAME }}/*.{bin,tar.gz} \
+              /mnt/openwrt/openwrt/${{ steps.generate_name.outputs.RELEASE_NAME }}/* \
               --title "Release ${{ steps.generate_name.outputs.RELEASE_NAME }}" \
-              --body "CMCC RAX 3000M"
+              --notes "CMCC RAX 3000M"
       env:
         # 使用 Personal Access Token 进行身份验证
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
