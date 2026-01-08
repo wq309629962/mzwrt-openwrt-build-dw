@@ -49,7 +49,7 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        # sudo -E apt-get -y purge azure-cli* docker* ghc* zulu* hhvm* llvm* firefox* google* dotnet* aspnetcore* powershell* openjdk* adoptopenjdk* mysql* php* mongodb* moby* snap* || true
+        sudo -E apt-get -y purge azure-cli* docker* ghc* zulu* hhvm* llvm* firefox* google* dotnet* aspnetcore* powershell* openjdk* adoptopenjdk* mysql* php* mongodb* moby* snap* || true
         sudo -E apt-get update
         sudo -E apt-get -yqq upgrade
         sudo -E apt-get -yqq full-upgrade
@@ -73,7 +73,7 @@ jobs:
         git clone -b $OPENWRT_VERSION --single-branch --depth=1 $REPO_URL $OPENWRT_DIR
         cd openwrt
         cp -f ../mzwrt-openwrt/diy1.sh ./
-        #chmod +x ./diy1.sh && ./diy1.sh
+        chmod +x ./diy1.sh && ./diy1.sh
 
     - name: Display system info
       run: |
@@ -91,8 +91,6 @@ jobs:
     - name: Update & Install feeds
       working-directory: /mnt/openwrt/openwrt
       run: |
-        make clean
-        make dirclean
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         cp -f ../mzwrt-openwrt/diy2.sh ./
