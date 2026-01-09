@@ -211,7 +211,7 @@ jobs:
         cd mzwrt-openwrt
         gh release create ${{ steps.generate_name.outputs.RELEASE_TAG }} \
               /mnt/openwrt/openwrt/${{ steps.generate_name.outputs.RELEASE_NAME }}/* \
-              --title "Release ${{ steps.generate_name.outputs.RELEASE_NAME }}" \
+              --title "${{ steps.generate_name.outputs.RELEASE_NAME }}" \
               --notes "CMCC RAX 3000M"
       env:
         # 使用 Personal Access Token 进行身份验证
