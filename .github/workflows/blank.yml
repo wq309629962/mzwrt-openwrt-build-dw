@@ -170,7 +170,6 @@ jobs:
         find ./bin/targets/mediatek/filogic -type f -not -name "*.bin" -not -name "*.tar.gz" -exec echo {} \;
         echo "======================="
 
-
         # 删除非 .bin 和 .tar.gz 文件
         if [ -d ./bin/targets/mediatek/filogic ]; then
           # 排除 packages.tar.gz，删除其他内容
@@ -179,20 +178,14 @@ jobs:
           sudo rm -rf ./bin/targets/mediatek/filogic/packages
         fi
 
-
         mkdir -p ./${{ steps.generate_name.outputs.RELEASE_NAME }}
-        cp -r ./bin/targets/mediatek/filogic/*.{bin,tar.gz} ./${{ steps.generate_name.outputs.RELEASE_NAME }}/
+        cp -r ./bin/targets/mediatek/filogic/* ./${{ steps.generate_name.outputs.RELEASE_NAME }}/
         echo "======================="
-
         echo "Release name: ${{ steps.generate_name.outputs.RELEASE_NAME }}"
         echo "Release name: ${{ steps.generate_name.outputs.RELEASE_TAG }}"
-
         echo "======================="
-
         ls ./${{ steps.generate_name.outputs.RELEASE_NAME }}/
         echo "======================="
-
-
 
     # 11. Upload Artifact
     - name: Upload Artifact
