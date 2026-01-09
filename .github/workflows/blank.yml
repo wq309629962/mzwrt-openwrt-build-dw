@@ -201,13 +201,39 @@ jobs:
 
     - name: Publish build to B repository
       run: |
-        # 克隆 B 仓库并推送
+        # 克隆 B 仓库并进入
         git clone https://github.com/mzwrt/mzwrt-openwrt.git
         cd mzwrt-openwrt
-        gh release create ${{ steps.generate_name.outputs.RELEASE_TAG }} \
-              /mnt/openwrt/openwrt/${{ steps.generate_name.outputs.RELEASE_NAME }}/* \
-              --title "${{ steps.generate_name.outputs.RELEASE_NAME }}" \
-              --notes "CMCC RAX 3000M"
+    
+        # 获取构建文件夹路径
+        BUILD_PATH="/mnt/openwrt/openwrt/${{ steps.generate_name.outputs.RELEASE_NAME }}"
+        REPO="mzwrt/mzwrt-openwrt"  # 目标仓库，填写正确的 GitHub 仓库名
+
+        # 创建 Release 并获取 Release ID
+        RELEASE_RESPONSE=$(curl -X POST \
+          -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+        -d '{"tag_name": "${{ steps.generate_name.outputs.RELEASE_TAG }}", "name": "${{ steps.generate_name.outputs.RELEASE_NAME }}", "body": "CMCC RAX 3000M NAND firmware"}' \
+        "https://api.github.com/repos/$REPO/releases")
+    
+        # 获取 Release ID
+        RELEASE_ID=$(echo $RELEASE_RESPONSE | jq -r '.id')
+
+        # 检查 RELEASE_ID 是否正确
+        if [ "$RELEASE_ID" == "null" ]; then
+        echo "Release creation failed. Response: $RELEASE_RESPONSE"
+        exit 1
+        fi
+
+        # 上传文件夹中的所有文件到该 Release
+        for file in $(find $BUILD_PATH -type f); do
+        filename=$(basename "$file")
+        echo "Uploading $filename..."
+      
+        curl -L --header "Authorization: token ${{ secrets.GH_TOKEN }}" \
+             --data-binary @"$file" \
+             "https://uploads.github.com/repos/$REPO/releases/$RELEASE_ID/assets?name=$filename"
+        done
       env:
-        # 使用 Personal Access Token 进行身份验证
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      # 使用 Personal Access Token 进行身份验证
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
