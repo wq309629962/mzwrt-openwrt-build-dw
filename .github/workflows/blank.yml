@@ -207,7 +207,22 @@ jobs:
         gh release create ${{ steps.generate_name.outputs.RELEASE_TAG }} \
               /mnt/openwrt/openwrt/${{ steps.generate_name.outputs.RELEASE_NAME }}/* \
               --title "${{ steps.generate_name.outputs.RELEASE_NAME }}" \
-              --notes "CMCC RAX 3000M"
+              --notes |
+              版本更新说明
+
+              ## 更新内容：
+
+              - **内存优化**：调整了内核参数，优化了内存占用，使系统在满负载下的表现更加均衡，减少了高负载情况下的内存压力。
+              - **性能调节**：虽然进行了一些性能优化，整体性能有所轻微下降，但用户体验几乎没有感知到变化。
+              - **细节优化**：对系统进行了若干小细节的优化，提升了稳定性和响应速度。
+
+              ## 总结：
+
+              该版本已经经过全面优化，提升了系统的稳定性与流畅度。
+
+              由于调节后的内存和性能优化已达到预期效果，此版本应为最终版，除非发现问题，否则不会再进行修改。
+
+              如果在使用过程中遇到任何问题，欢迎及时反馈，我们会根据反馈进行修正。
       env:
         # 使用 Personal Access Token 进行身份验证
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
