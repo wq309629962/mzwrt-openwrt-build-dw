@@ -87,14 +87,6 @@ jobs:
         echo $PATH
         echo "======================="
         
-    # 6. Configuration Customization
-    - name: Configuration Customization - Build_mt7981_rax3000m
-      working-directory: /mnt/openwrt/openwrt
-      run: |
-        cp -f ../mzwrt-openwrt/rax3000m.config ./
-        mv rax3000m.config .config
-        make defconfig
-        
     # 5. Update & Install feeds
     - name: Update & Install feeds
       working-directory: /mnt/openwrt/openwrt
@@ -102,14 +94,21 @@ jobs:
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         cp -f ../mzwrt-openwrt/diy2.sh ./
-        chmod +x ./diy2.sh && ./diy2.sh 
+        chmod +x ./diy2.sh && ./diy2.sh
+
+    # 6. Configuration Customization
+    - name: Configuration Customization - Build_mt7981_rax3000m
+      working-directory: /mnt/openwrt/openwrt
+      run: |
+        cp -f ../mzwrt-openwrt/rax3000m.config ./
+        mv rax3000m.config .config
+        make defconfig
 
     # 7. Download package
     - name: Download package
       working-directory: /mnt/openwrt/openwrt
       run: |
         echo "======================="
-        make defconfig
         echo "======================="
         df -h
         echo "======================="
