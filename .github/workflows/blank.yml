@@ -23,14 +23,47 @@ jobs:
     # 2. Find and mount largest disk
     - name: Find and mount largest disk
       run: |
-          df -h
-          largest_disk=$(lsblk -o NAME,SIZE,MOUNTPOINT | grep -vE 'MOUNTPOINT|/dev/loop' | sort -k2 -h | tail -n 1 | awk '{print $1}' | sed 's/^[^a-zA-Z0-9]*//g')
-          echo "Largest disk is /dev/$largest_disk"
-          sudo -E mkdir -p /mnt/openwrt
-          sudo -E chown -R $USER:$USER /mnt/openwrt
-          sudo -E mount /dev/$largest_disk /mnt/openwrt
-          df -h /mnt/openwrt
-          echo "/dev/$largest_disk /mnt/openwrt ext4 defaults 0 2" | sudo -E tee -a /etc/fstab
+        # 查看磁盘使用情况
+        df -h
+
+        # 找到最大的磁盘
+        largest_disk=$(lsblk -o NAME,SIZE,MOUNTPOINT | grep -vE 'MOUNTPOINT|/dev/loop' | sort -k2 -h | tail -n 1 | awk '{print $1}' | sed 's/^[^a-zA-Z0-9]*//g')
+        echo "Largest disk is /dev/$largest_disk"
+
+        # 检查该磁盘是否已经挂载，如果已经挂载，先卸载
+        if mount | grep -q "/dev/$largest_disk"; then
+          echo "/dev/$largest_disk is already mounted, unmounting first."
+          sudo umount /dev/$largest_disk
+        fi
+
+        # 检查挂载点是否已经被使用，如果是，先卸载挂载点
+        if mount | grep -q "/mnt/openwrt"; then
+          echo "/mnt/openwrt is already mounted, unmounting first."
+          sudo umount /mnt/openwrt
+        fi
+
+        # 创建挂载点（在 GitHub Actions 的环境中，创建一个目录即可模拟）
+        sudo -E mkdir -p /mnt/openwrt
+        sudo -E chown -R $USER:$USER /mnt/openwrt
+
+        # 检查磁盘是否已经格式化为 ext4，如果不是，格式化磁盘
+        if ! sudo blkid /dev/$largest_disk | grep -q "TYPE=\"ext4\""; then
+          echo "/dev/$largest_disk is not formatted as ext4. Formatting now..."
+          sudo mkfs.ext4 /dev/$largest_disk
+        fi
+
+        # 挂载磁盘
+        sudo -E mount /dev/$largest_disk /mnt/openwrt
+
+        # 查看挂载后的磁盘使用情况
+        df -h /mnt/openwrt
+
+        # 将挂载信息添加到 fstab 以便开机自动挂载
+        echo "/dev/$largest_disk /mnt/openwrt ext4 defaults 0 2" | sudo -E tee -a /etc/fstab
+
+        # 检查 dmesg 输出，查看是否有更多的错误信息
+        dmesg | tail -n 20
+
 
     - name: Checkout private repository
       uses: actions/checkout@v4
