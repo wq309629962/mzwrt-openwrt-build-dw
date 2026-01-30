@@ -5,8 +5,8 @@ on:
   workflow_dispatch:
 
   # 定时触发编译
- # schedule:
- #   - cron: '0 21 * * 5'
+  schedule:
+    - cron: '0 21 * * 5'
 
 jobs:
   Build_mt7981_rax3000m:
