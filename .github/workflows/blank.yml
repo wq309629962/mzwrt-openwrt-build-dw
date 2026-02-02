@@ -44,6 +44,7 @@ jobs:
       run: |
         sudo -E chown -R $USER:$USER ./mzwrt-openwrt
         sudo -E mv ./mzwrt-openwrt /mnt/openwrt/
+        ls /mnt/openwrt/
 
     # 3. Initialization environment
     - name: Initialization environment
