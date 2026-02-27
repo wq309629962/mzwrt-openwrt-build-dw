@@ -196,7 +196,7 @@ jobs:
         artifacts: /mnt/openwrt/openwrt/${{ steps.generate_name.outputs.RELEASE_NAME }}/*
         name: ${{ steps.generate_name.outputs.RELEASE_NAME }}
         tag: ${{ steps.generate_name.outputs.RELEASE_TAG }}
-        body: CMCC-RAX3000M NAND firmware
+        body: 2026-02-27- 修复 EMMC 不能保存配置问题
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Publish build to B repository
