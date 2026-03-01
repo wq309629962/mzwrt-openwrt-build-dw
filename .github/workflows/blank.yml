@@ -180,13 +180,14 @@ jobs:
 
         ls ./${{ steps.generate_name.outputs.RELEASE_NAME }}/
         echo "======================="
-        echo "CMCC RAX3000M" > /mnt/openwrt/openwrt/release_notes.txt
+        echo "2026-02-27- 修复 EMMC 不能保存配置问题
+              2026-03-1 修复NAT，修复加密，" > /mnt/openwrt/openwrt/release_notes.txt
 
     # 11. Upload Artifact
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: 2026-02-27- 修复 EMMC 不能保存配置问题
+        name: CMCC-RAX3000M
         path: /mnt/openwrt/openwrt/${{ steps.generate_name.outputs.RELEASE_NAME }}/*
 
     # 12. Create Release & Upload
