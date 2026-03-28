@@ -40,6 +40,13 @@ jobs:
         token: ${{ secrets.GH_TOKEN }}
         ref: 'main'
       
+    - name: Compute config hash for cache keys
+      run: |
+        config_hash=$(sha256sum ./mzwrt-openwrt/rax3000m.config ./mzwrt-openwrt/diy1.sh ./mzwrt-openwrt/diy2.sh 2>/dev/null | sha256sum | cut -d' ' -f1)
+        toolchain_hash=$(sha256sum ./mzwrt-openwrt/rax3000m.config 2>/dev/null | sha256sum | cut -d' ' -f1)
+        echo "CONFIG_HASH=${config_hash}" >> $GITHUB_ENV
+        echo "TOOLCHAIN_HASH=${toolchain_hash}" >> $GITHUB_ENV
+
     - name: Move repo to /mnt/openwrt
       run: |
         sudo -E chown -R $USER:$USER ./mzwrt-openwrt
@@ -52,8 +59,6 @@ jobs:
       run: |
         sudo -E apt-get -y purge azure-cli* docker* ghc* zulu* hhvm* llvm* firefox* google* dotnet* aspnetcore* powershell* openjdk* adoptopenjdk* mysql* php* mongodb* moby* snap* || true
         sudo -E apt-get update
-        sudo -E apt-get -yqq upgrade
-        sudo -E apt-get -yqq full-upgrade
         sudo -E apt-get -yqq autoremove --purge
         sudo -E apt-get -yqq autoclean
         sudo -E apt-get -yqq clean
@@ -62,6 +67,13 @@ jobs:
         sudo -E systemctl daemon-reload
         sudo -E timedatectl set-timezone "Asia/Shanghai"
         git config --global user.name 'GitHub Actions' && git config --global user.email '${{ secrets.GH_MAIL }}'
+
+    # Setup ccache to speed up repeated compilations
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        max-size: 2G
+        key: ccache-openwrt-mt7981-rax3000m
 
     # 4. Clone source code
     - name: Clone source code
@@ -75,6 +87,25 @@ jobs:
         cd openwrt
         cp -f ../diy1.sh ./
         chmod +x ./diy1.sh && ./diy1.sh
+
+    # Cache OpenWrt downloads directory to avoid re-downloading packages
+    - name: Cache OpenWrt downloads directory
+      uses: actions/cache@v4
+      with:
+        path: /mnt/openwrt/openwrt/dl
+        key: openwrt-dl-v24.10.5-${{ env.CONFIG_HASH }}
+        restore-keys: |
+          openwrt-dl-v24.10.5-
+          openwrt-dl-
+
+    # Cache OpenWrt toolchain to avoid rebuilding the cross-compiler each run
+    - name: Cache OpenWrt toolchain
+      uses: actions/cache@v4
+      with:
+        path: /mnt/openwrt/openwrt/staging_dir/toolchain-*
+        key: openwrt-toolchain-v24.10.5-${{ env.TOOLCHAIN_HASH }}
+        restore-keys: |
+          openwrt-toolchain-v24.10.5-
 
     - name: Display system info
       run: |
@@ -102,6 +133,7 @@ jobs:
       working-directory: /mnt/openwrt/openwrt
       run: |
         mv ../rax3000m.config .config
+        echo "CONFIG_CCACHE=y" >> .config
         make defconfig
 
     # 7. Download package
