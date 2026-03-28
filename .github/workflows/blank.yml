@@ -181,7 +181,8 @@ jobs:
         ls ./${{ steps.generate_name.outputs.RELEASE_NAME }}/
         echo "======================="
         echo "2026-02-27- 修复 EMMC 不能保存配置问题
-              2026-03-1 修复NAT，修复加密，" > /mnt/openwrt/openwrt/release_notes.txt
+              2026-03-1 修复NAT，修复加密
+              2026-03-28 添加主题显示CPU温度和 WIFI芯片温度" > /mnt/openwrt/openwrt/release_notes.txt
 
     # 11. Upload Artifact
     - name: Upload Artifact
